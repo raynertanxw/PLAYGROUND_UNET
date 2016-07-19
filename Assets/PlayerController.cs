@@ -20,7 +20,7 @@ public class PlayerController : NetworkBehaviour
 
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
-			Fire();
+			CmdFire();
 		}
 	}
 
@@ -31,7 +31,8 @@ public class PlayerController : NetworkBehaviour
 		GetComponent<MeshRenderer>().material.color = Color.blue;
 	}
 
-	private void Fire()
+	[Command]
+	private void CmdFire()
 	{
 		// Create the Bullet from the Bullet Prefab
 		var bullet = (GameObject)Instantiate (
@@ -41,6 +42,9 @@ public class PlayerController : NetworkBehaviour
 
 		// Add velocity to the bullet
 		bullet.GetComponent<Rigidbody>().velocity = bullet.transform.forward * 6;
+
+		// Spawn the bullet on clients.
+		NetworkServer.Spawn(bullet);
 
 		// Destroy the bullet after 2 seconds
 		Destroy(bullet, 2.0f);
