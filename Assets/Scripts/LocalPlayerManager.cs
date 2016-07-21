@@ -8,7 +8,7 @@ public class LocalPlayerManager : NetworkBehaviour
 	{
 		base.OnStartLocalPlayer();
 
-		GameObject.Find("Lobby Panel").GetComponent<LobbyMenu>().SetLobbyMenuVisible(false);
+//		GameObject.Find("Lobby Panel").GetComponent<LobbyMenu>().SetLobbyMenuVisible(false);
 	}
 
 	public override void OnNetworkDestroy()

@@ -7,6 +7,13 @@ public class PlayerController : NetworkBehaviour
 	public GameObject bulletPrefab;
 	public Transform bulletSpawn;
 
+	private BulletSpawnManager bulletSpwnManager;
+
+	void Start()
+	{
+		bulletSpwnManager = GameObject.Find("BulletSpawnManager").GetComponent<BulletSpawnManager> ();
+	}
+
 	void Update()
 	{
 		if (!isLocalPlayer)
@@ -52,18 +59,12 @@ public class PlayerController : NetworkBehaviour
 	private void CmdFire()
 	{
 		// Create the Bullet from the Bullet Prefab
-		var bullet = (GameObject)Instantiate (
-			bulletPrefab,
-			bulletSpawn.position,
-			bulletSpawn.rotation);
-
+		var bullet = bulletSpwnManager.GetFromPool(bulletSpawn.position);
+		bullet.transform.rotation = bulletSpawn.rotation;
 		// Add velocity to the bullet
 		bullet.GetComponent<Rigidbody>().velocity = bullet.transform.forward * 6;
 
 		// Spawn the bullet on clients.
-		NetworkServer.Spawn(bullet);
-
-		// Destroy the bullet after 2 seconds
-		Destroy(bullet, 2.0f);
+		NetworkServer.Spawn(bullet, bulletSpwnManager.assetID);
 	}
 }

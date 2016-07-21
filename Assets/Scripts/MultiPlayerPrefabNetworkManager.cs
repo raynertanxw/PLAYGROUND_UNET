@@ -54,19 +54,6 @@ public class MultiPlayerPrefabNetworkManager : NetworkManager
 		base.OnStartServer();
 	}
 
-	private void SpawnFakeAStar()
-	{
-		GameObject fakeAStar = (GameObject) Instantiate(spawnPrefabs[2]);
-
-		NetworkServer.Spawn(fakeAStar);
-	}
-
-	public override void OnClientConnect(NetworkConnection conn)
-	{
-		client.RegisterHandler(MsgTypes.PlayerPrefab, OnRequestPrefab);
-		base.OnClientConnect(conn);
-	}
-
 	private void OnRequestPrefab(NetworkMessage netMsg)
 	{
 		MsgTypes.PlayerPrefabMsg msg = new MsgTypes.PlayerPrefabMsg();
@@ -93,8 +80,32 @@ public class MultiPlayerPrefabNetworkManager : NetworkManager
 
 
 
-	public override void OnStopServer()
+	// called when connected to a server
+	public override void OnClientConnect(NetworkConnection conn)
 	{
+		// TO MAKE THE MULTIPLE PREFAB SPAWN WORK
+		client.RegisterHandler(MsgTypes.PlayerPrefab, OnRequestPrefab);
+		// TO MAKE THE MULTIPLE PREFAB SPAWN WORK
+
+		ClientScene.Ready(conn);
+		ClientScene.AddPlayer(0);
+
+		GameObject.Find("Lobby Panel").GetComponent<LobbyMenu>().SetLobbyMenuVisible(false);
+	}
+
+	// called when disconnected from a server
+	public override void OnClientDisconnect(NetworkConnection conn)
+	{
+		StopClient();
+
+		GameObject.Find("Lobby Panel").GetComponent<LobbyMenu>().SetLobbyMenuVisible(true);
+
+	}
+
+	public override void OnStopHost()
+	{
+		base.OnStopHost();
+
 		GameObject.Find("Lobby Panel").GetComponent<LobbyMenu>().SetLobbyMenuVisible(true);
 	}
 }

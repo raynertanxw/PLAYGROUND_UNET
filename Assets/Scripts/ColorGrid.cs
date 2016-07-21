@@ -6,15 +6,16 @@ public class ColorGrid : NetworkBehaviour
 {
 	[SyncVar (hook = "OnChangeGridWireframeCol")] private Color gridWireframeCol = Color.cyan;
 	private Material cubeMat;
+	public GameObject cubeGO;
 
-	void Start()
+	public override void OnStartServer()
 	{
-		if (cubeMat != null)
-			return;
+		base.OnStartServer();
 
-		GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		cube.GetComponent<MeshRenderer>().material = new Material (Shader.Find(" Diffuse"));
+		GameObject cube = (GameObject) Instantiate(cubeGO, Vector3.zero, Quaternion.identity);
 		cubeMat = cube.GetComponent<MeshRenderer>().material;
+
+		NetworkServer.Spawn(cube);
 	}
 
 	[Command] public void CmdRandColor()
