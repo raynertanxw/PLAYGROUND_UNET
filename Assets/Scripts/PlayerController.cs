@@ -24,11 +24,28 @@ public class PlayerController : NetworkBehaviour
 		}
 	}
 
-	public override void OnStartLocalPlayer ()
+	public override void OnStartLocalPlayer()
 	{
-		base.OnStartLocalPlayer ();
+		base.OnStartLocalPlayer();
 
-		GetComponent<MeshRenderer>().material.color = Color.blue;
+		if (isServer && isClient)
+		{
+			GetComponent<MeshRenderer>().material.color = Color.green;
+		}
+		else
+		{
+			GetComponent<MeshRenderer>().material.color = Color.blue;
+		}
+	}
+
+	public override void OnStartClient()
+	{
+		base.OnStartClient();
+
+		if (isLocalPlayer)
+			return;
+
+		GetComponent<MeshRenderer>().material.color = Color.yellow;
 	}
 
 	[Command]
