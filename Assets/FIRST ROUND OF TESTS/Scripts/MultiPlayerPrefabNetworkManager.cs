@@ -3,17 +3,6 @@ using System.Collections;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class MsgTypes
-{
-	public const short PlayerPrefab = MsgType.Highest + 1;
-
-	public class PlayerPrefabMsg : MessageBase
-	{
-		public short controllerID;    
-		public short prefabIndex;
-	}
-}
-
 public class MultiPlayerPrefabNetworkManager : NetworkManager
 {
 	private static MultiPlayerPrefabNetworkManager sIntance = null;
@@ -50,21 +39,21 @@ public class MultiPlayerPrefabNetworkManager : NetworkManager
 
 	public override void OnStartServer()
 	{
-		NetworkServer.RegisterHandler(MsgTypes.PlayerPrefab, OnResponsePrefab);
+		NetworkServer.RegisterHandler(MessageTypes.PlayerPrefab, OnResponsePrefab);
 		base.OnStartServer();
 	}
 
 	private void OnRequestPrefab(NetworkMessage netMsg)
 	{
-		MsgTypes.PlayerPrefabMsg msg = new MsgTypes.PlayerPrefabMsg();
-		msg.controllerID = netMsg.ReadMessage<MsgTypes.PlayerPrefabMsg>().controllerID;
+		MessageTypes.PlayerPrefabMsg msg = new MessageTypes.PlayerPrefabMsg();
+		msg.controllerID = netMsg.ReadMessage<MessageTypes.PlayerPrefabMsg>().controllerID;
 		msg.prefabIndex = playerPrefabIndex;
-		client.Send(MsgTypes.PlayerPrefab, msg);
+		client.Send(MessageTypes.PlayerPrefab, msg);
 	}
 
 	private void OnResponsePrefab(NetworkMessage netMsg)
 	{
-		MsgTypes.PlayerPrefabMsg msg = netMsg.ReadMessage<MsgTypes.PlayerPrefabMsg>();  
+		MessageTypes.PlayerPrefabMsg msg = netMsg.ReadMessage<MessageTypes.PlayerPrefabMsg>();  
 		playerPrefab = spawnPrefabs[msg.prefabIndex];
 		base.OnServerAddPlayer(netMsg.conn, msg.controllerID);
 		Debug.Log(playerPrefab.name + " spawned!");
@@ -72,9 +61,9 @@ public class MultiPlayerPrefabNetworkManager : NetworkManager
 
 	public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
 	{
-		MsgTypes.PlayerPrefabMsg msg = new MsgTypes.PlayerPrefabMsg();
+		MessageTypes.PlayerPrefabMsg msg = new MessageTypes.PlayerPrefabMsg();
 		msg.controllerID = playerControllerId;
-		NetworkServer.SendToClient(conn.connectionId, MsgTypes.PlayerPrefab, msg);
+		NetworkServer.SendToClient(conn.connectionId, MessageTypes.PlayerPrefab, msg);
 	}
 
 
@@ -84,7 +73,7 @@ public class MultiPlayerPrefabNetworkManager : NetworkManager
 	public override void OnClientConnect(NetworkConnection conn)
 	{
 		// TO MAKE THE MULTIPLE PREFAB SPAWN WORK
-		client.RegisterHandler(MsgTypes.PlayerPrefab, OnRequestPrefab);
+		client.RegisterHandler(MessageTypes.PlayerPrefab, OnRequestPrefab);
 		// TO MAKE THE MULTIPLE PREFAB SPAWN WORK
 
 		ClientScene.Ready(conn);
