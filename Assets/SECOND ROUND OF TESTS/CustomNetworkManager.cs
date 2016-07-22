@@ -40,35 +40,37 @@ public class CustomNetworkManager : NetworkManager
 
 	public override void OnClientSceneChanged(NetworkConnection conn)
 	{
-		// DO NOTHING :D:D:D
+		// OVERRIDE TO MAKE SURE ClientScene.Ready(conn) is only called if scene is not ready.
+		if (ClientScene.ready)
+			return;
+		
+		// always become ready.
+		ClientScene.Ready(conn);
 
-//		// always become ready.
-//		ClientScene.Ready(conn);
-//
-//		if (!m_AutoCreatePlayer)
-//		{
-//			return;
-//		}
-//
-//		bool addPlayer = (ClientScene.localPlayers.Count == 0);
-//		bool foundPlayer = false;
-//		for (int i = 0; i < ClientScene.localPlayers.Count; i++)
-//		{
-//			if (ClientScene.localPlayers[i].gameObject != null)
-//			{
-//				foundPlayer = true;
-//				break;
-//			}
-//		}
-//		if (!foundPlayer)
-//		{
-//			// there are players, but their game objects have all been deleted
-//			addPlayer = true;
-//		}
-//		if (addPlayer)
-//		{
-//			ClientScene.AddPlayer(0);
-//		}
+		if (!autoCreatePlayer)
+		{
+			return;
+		}
+
+		bool addPlayer = (ClientScene.localPlayers.Count == 0);
+		bool foundPlayer = false;
+		for (int i = 0; i < ClientScene.localPlayers.Count; i++)
+		{
+			if (ClientScene.localPlayers[i].gameObject != null)
+			{
+				foundPlayer = true;
+				break;
+			}
+		}
+		if (!foundPlayer)
+		{
+			// there are players, but their game objects have all been deleted
+			addPlayer = true;
+		}
+		if (addPlayer)
+		{
+			ClientScene.AddPlayer(0);
+		}
 	}
 
 
