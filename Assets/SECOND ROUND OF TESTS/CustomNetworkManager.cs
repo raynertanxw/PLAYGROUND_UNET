@@ -14,18 +14,13 @@ public class CustomNetworkManager : NetworkManager
 	public override void OnStartServer()
 	{
 		NetworkServer.RegisterHandler(MessageTypes.PlayerMode, OnServerRespondToPrefabType);
-		Debug.Log("OnStartServer");
 	}
 
 	public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
 	{
-		Debug.Log("OnServerAddPlayer Custom");
-
 		MessageTypes.PlayerModeMsg msg = new MessageTypes.PlayerModeMsg();
 		msg.controllerID = playerControllerId;
 		NetworkServer.SendToClient(conn.connectionId, MessageTypes.PlayerMode, msg);
-
-		Debug.Log("Server sent client message");
 	}
 
 	// called when connected to a server
@@ -79,7 +74,6 @@ public class CustomNetworkManager : NetworkManager
 	// 
 	private void OnClientRespondToServerPrefabTypeRequest(NetworkMessage netMsg)
 	{
-		Debug.Log("Player Recieved Msg");
 		MessageTypes.PlayerModeMsg msg = new MessageTypes.PlayerModeMsg();
 		msg.controllerID = netMsg.ReadMessage<MessageTypes.PlayerModeMsg>().controllerID;
 		msg.mode = mPlayerMode;
@@ -88,7 +82,6 @@ public class CustomNetworkManager : NetworkManager
 
 	private void OnServerRespondToPrefabType(NetworkMessage netMsg)
 	{
-		Debug.Log("Server Recieve Message");
 		MessageTypes.PlayerModeMsg msg = netMsg.ReadMessage<MessageTypes.PlayerModeMsg>();  
 		playerPrefab = spawnPrefabs[(int)msg.mode];
 		base.OnServerAddPlayer(netMsg.conn, msg.controllerID);
