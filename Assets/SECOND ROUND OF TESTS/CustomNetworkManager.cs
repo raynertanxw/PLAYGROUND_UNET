@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.Networking;
+using System.Collections;
+using System.Collections.Generic;
 
 public enum PlayerMode { Hero = 0, God }
 
@@ -8,8 +9,7 @@ public class CustomNetworkManager : NetworkManager
 {
 	public GameObject[] PlayerPrefabs;
 
-	[SerializeField]
-	private PlayerMode mPlayerMode = PlayerMode.Hero;
+	[SerializeField] private PlayerMode mPlayerMode = PlayerMode.Hero;
 
 	public override void OnStartServer()
 	{
@@ -27,6 +27,7 @@ public class CustomNetworkManager : NetworkManager
 	public override void OnClientConnect(NetworkConnection conn)
 	{
 		client.RegisterHandler(MessageTypes.PlayerMode, OnClientRespondToServerPrefabTypeRequest);
+		client.RegisterHandler(MessageTypes.UpdatePosNRot, OnClientEmpty);
 
 		// Base functionality.
 		ClientScene.Ready(conn);
@@ -71,7 +72,6 @@ public class CustomNetworkManager : NetworkManager
 
 
 	#region Message Handlers
-	// 
 	private void OnClientRespondToServerPrefabTypeRequest(NetworkMessage netMsg)
 	{
 		MessageTypes.PlayerModeMsg msg = new MessageTypes.PlayerModeMsg();
@@ -83,9 +83,14 @@ public class CustomNetworkManager : NetworkManager
 	private void OnServerRespondToPrefabType(NetworkMessage netMsg)
 	{
 		MessageTypes.PlayerModeMsg msg = netMsg.ReadMessage<MessageTypes.PlayerModeMsg>();  
-		playerPrefab = spawnPrefabs[(int)msg.mode];
+		playerPrefab = PlayerPrefabs[(int)msg.mode];
 		base.OnServerAddPlayer(netMsg.conn, msg.controllerID);
 		Debug.Log(playerPrefab.name + " spawned!");
+	}
+
+	private void OnClientEmpty(NetworkMessage netMsg)
+	{
+
 	}
 	#endregion
 }
